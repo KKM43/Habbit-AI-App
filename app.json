@@ -20,8 +20,22 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.kaustubhexpo.HabitTracker",
+      "permissions": [
+        "POST_NOTIFICATIONS"
+      ]
     },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#6200ee",
+          "sounds": ["default"]
+        }
+      ]
+    ],
     "web": {
       "favicon": "./assets/favicon.png"
     }
