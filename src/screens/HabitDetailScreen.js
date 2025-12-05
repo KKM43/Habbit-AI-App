@@ -1,12 +1,15 @@
-// src/screens/HabitDetailScreen.js
+// src/screens/HabitDetailScreen.js 
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { doc, onSnapshot, deleteDoc, collection } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../context/ThemeContext';
 import { getDatesArray, calculateStreaks } from '../utils/dateUtils';
+import StreakFreezeButton from '../components/StreakFreezeButton'; 
 
 export default function HabitDetailScreen({ route, navigation }) {
+  const { theme } = useTheme();
   const { habitId } = route.params;
   const [habit, setHabit] = useState(null);
   const userId = auth.currentUser.uid;
@@ -43,7 +46,6 @@ export default function HabitDetailScreen({ route, navigation }) {
         style: 'destructive',
         onPress: async () => {
           try {
-            // Correct way: create the exact same doc reference
             const habitDocRef = doc(db, 'users', userId, 'habits', habitId);
             await deleteDoc(habitDocRef);
             navigation.goBack();
@@ -61,30 +63,48 @@ export default function HabitDetailScreen({ route, navigation }) {
   const { current, best } = calculateStreaks(habit.progress || {});
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]} contentContainerStyle={{ paddingBottom: 40 }}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={28} color="#333" />
+          <Ionicons name="arrow-back" size={22} color={theme.colors.text} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={deleteHabit}>
-          <Ionicons name="trash" size={28} color="#d32f2f" />
-        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <TouchableOpacity onPress={() => navigation.navigate('EditHabit', { habitId })} style={styles.iconBtn}>
+            <Ionicons name="pencil" size={22} color={theme.colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={deleteHabit} style={styles.iconBtn}>
+            <Ionicons name="trash" size={22} color={theme.colors.error} />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <Text style={styles.name}>{habit.name}</Text>
-      {habit.category && <Text style={styles.category}>{habit.category}</Text>}
-      <Text style={styles.streak}>Current Streak: {current}  |  Best: {best}</Text>
+      <View style={[styles.hero, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+        <Text style={[styles.name, { color: theme.colors.text }]}>{habit.name}</Text>
+        {habit.category && <Text style={[styles.category, { color: theme.colors.primary }]}>{habit.category}</Text>}
+        
+        <View style={[styles.heroMeta, { backgroundColor: theme.colors.surfaceAlt }]}>
+          <Text style={[styles.streak, { color: theme.colors.text }]}>Current: {current}</Text>
+          <Text style={[styles.best, { color: theme.colors.textSecondary }]}>Best: {best}</Text>
+        </View>
 
-      {habit.notes ? <Text style={styles.notes}>{habit.notes}</Text> : null}
+        {/* STREAK FREEZE BUTTON — ADDED HERE */}
+        <StreakFreezeButton habitId={habitId} currentStreak={current} />
+      </View>
 
-      <Text style={styles.calendarTitle}>Last 30 Days</Text>
+      {habit.notes ? (
+        <Text style={[styles.notes, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}>
+          {habit.notes}
+        </Text>
+      ) : null}
+
+      <Text style={[styles.calendarTitle, { color: theme.colors.text }]}>Last 30 Days</Text>
       <View style={styles.calendar}>
         {dates.map((date) => {
           const done = habit.progress?.[date]?.status === 'done';
           return (
             <View key={date} style={styles.day}>
-              <Text style={styles.dayLabel}>{date.slice(8)}</Text>
-              <View style={[styles.dayBox, done && styles.doneBox]} />
+              <Text style={[styles.dayLabel, { color: theme.colors.textSecondary }]}>{date.slice(8)}</Text>
+              <View style={[styles.dayBox, done && styles.doneBox, { backgroundColor: done ? theme.colors.success : theme.colors.surfaceAlt }]} />
             </View>
           );
         })}
@@ -93,18 +113,23 @@ export default function HabitDetailScreen({ route, navigation }) {
   );
 }
 
-// Styles unchanged (copy from your file)
+// Your existing styles remain unchanged
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, paddingTop: 60 },
-  name: { fontSize: 28, fontWeight: 'bold', paddingHorizontal: 20 },
-  category: { fontSize: 18, color: '#6200ee', paddingHorizontal: 20, marginTop: 5 },
-  streak: { fontSize: 18, paddingHorizontal: 20, marginTop: 20, fontWeight: '600' },
-  notes: { padding: 20, backgroundColor: '#f9f9f9', margin: 20, borderRadius: 12 },
-  calendarTitle: { fontSize: 18, fontWeight: 'bold', marginLeft: 20, marginTop: 30 },
-  calendar: { flexDirection: 'row', flexWrap: 'wrap', padding: 20 },
-  day: { alignItems: 'center', width: '14%', marginBottom: 10 },
-  dayLabel: { fontSize: 12, color: '#666' },
-  dayBox: { width: 30, height: 30, borderRadius: 8, backgroundColor: '#eee', marginTop: 5 },
-  doneBox: { backgroundColor: '#4caf50' },
+  container: { flex: 1 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 60 },
+  headerRight: { flexDirection: 'row', gap: 16 },
+  iconBtn: { padding: 8 },
+  hero: { margin: 20, padding: 24, borderRadius: 20, borderWidth: 1, paddingBottom: 20 },
+  name: { fontSize: 32, fontWeight: 'bold', textAlign: 'center', marginBottom: 8 },
+  category: { fontSize: 18, textAlign: 'center', marginBottom: 16 },
+  heroMeta: { flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 16, borderRadius: 16, marginTop: 12 },
+  streak: { fontSize: 24, fontWeight: '700' },
+  best: { fontSize: 18, opacity: 0.8 },
+  notes: { margin: 20, padding: 20, borderRadius: 16, borderWidth: 1, fontSize: 16, lineHeight: 24 },
+  calendarTitle: { fontSize: 20, fontWeight: 'bold', marginLeft: 20, marginTop: 20 },
+  calendar: { flexDirection: 'row', flexWrap: 'wrap', padding: 20, gap: 8 },
+  day: { alignItems: 'center', width: '12.5%' },
+  dayLabel: { fontSize: 12, marginBottom: 4 },
+  dayBox: { width: 36, height: 36, borderRadius: 10 },
+  doneBox: { opacity: 1 },
 });

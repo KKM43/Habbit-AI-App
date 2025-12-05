@@ -32,9 +32,12 @@
         {
           "icon": "./assets/icon.png",
           "color": "#6200ee",
-          "sounds": ["default"]
+          "sounds": [
+            "default"
+          ]
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "web": {
       "favicon": "./assets/favicon.png"

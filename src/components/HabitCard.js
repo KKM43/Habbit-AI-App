@@ -1,43 +1,195 @@
 // src/components/HabitCard.js
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { calculateStreaks } from '../utils/dateUtils';
+import { useTheme } from '../context/ThemeContext';
 
 export default function HabitCard({ habit, progress, onPress, onToggleToday }) {
+  const { theme } = useTheme();
   const today = new Date().toISOString().split('T')[0];
   const todayDone = progress?.[today]?.status === 'done';
   const { current, best } = calculateStreaks(progress);
+  const initial = habit.name ? habit.name.charAt(0).toUpperCase() : '?';
+  const percent = best > 0 ? Math.min(1, current / best) : (current > 0 ? 1 : 0);
+  const scale = useRef(new Animated.Value(1)).current;
+  const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
+  const handlePressIn = () => {
+    Animated.spring(scale, { toValue: 0.98, useNativeDriver: true, speed: 20, bounciness: 8 }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 20, bounciness: 8 }).start();
+  };
+
+  const getStreakColor = () => {
+    if (current >= best && best > 0) return '#26D07C';
+    if (current > 0) return '#FDB022';
+    return '#A0AEC0';
+  };
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
-      <View style={styles.row}>
-        <Text style={styles.name}>{habit.name}</Text>
-        <TouchableOpacity onPress={(e) => { e.stopPropagation(); onToggleToday(); }}>
-          <Ionicons
-            name={todayDone ? 'checkbox' : 'square-outline'}
-            size={36}
-            color={todayDone ? '#4caf50' : '#999'}
-          />
-        </TouchableOpacity>
-      </View>
+    <AnimatedTouchable
+      style={[styles.cardWrapper, { transform: [{ scale }] }]}
+      onPress={onPress}
+      activeOpacity={0.95}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+    >
+      <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+        {/* Header with Avatar and Title */}
+        <View style={styles.cardHeader}>
+          <LinearGradient
+            colors={theme.colors.gradient1}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.avatar}
+          >
+            <Text style={styles.avatarText}>{initial}</Text>
+          </LinearGradient>
 
-      <Text style={styles.category}>{habit.category || 'Uncategorized'}</Text>
+          <View style={styles.titleSection}>
+            <Text style={[styles.habitName, { color: theme.colors.text }]} numberOfLines={1}>{habit.name}</Text>
+            {habit.category && <Text style={[styles.category, { color: theme.colors.textSecondary }]}>{habit.category}</Text>}
+          </View>
 
-      <View style={styles.streakRow}>
-        <Text style={styles.streak}>🔥 {current} day{current !== 1 ? 's' : ''}</Text>
-        <Text style={styles.best}>Best: {best}</Text>
+          <TouchableOpacity
+            onPress={(e) => {
+              e.stopPropagation();
+              onToggleToday();
+            }}
+            style={styles.checkButton}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.checkbox, { borderColor: theme.colors.border }, todayDone && { backgroundColor: theme.colors.success, borderColor: theme.colors.success }]}>
+              {todayDone && <Ionicons name="checkmark" size={18} color="#FFFFFF" />}
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Streak Stats */}
+        <View style={[styles.statsRow, { backgroundColor: theme.colors.surfaceAlt }]}>
+          <View style={styles.statItem}>
+            <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>Current</Text>
+            <Text style={[styles.statValue, { color: getStreakColor() }]}>
+              🔥 {current}
+            </Text>
+          </View>
+          <View style={[styles.statDivider, { backgroundColor: theme.colors.border }]} />
+          <View style={styles.statItem}>
+            <Text style={[styles.statLabel, { color: theme.colors.textSecondary }]}>Best</Text>
+            <Text style={[styles.statValue, { color: theme.colors.text }]}>{best}</Text>
+          </View>
+        </View>
+
+        {/* Progress Bar */}
+        <View style={styles.progressSection}>
+          <View style={[styles.progressBarBg, { backgroundColor: theme.colors.surfaceAlt }]}>
+            <LinearGradient
+              colors={todayDone ? [theme.colors.success, '#059669'] : theme.colors.gradient1}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={[styles.progressBarFill, { width: `${Math.round(percent * 100)}%` }]}
+            />
+          </View>
+          <Text style={[styles.progressText, { color: theme.colors.textSecondary }]}>{Math.round(percent * 100)}%</Text>
+        </View>
       </View>
-    </TouchableOpacity>
+    </AnimatedTouchable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: '#fff', padding: 16, borderRadius: 12, marginVertical: 8, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 3 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  name: { fontSize: 18, fontWeight: '600', maxWidth: '75%' },
-  category: { color: '#666', marginTop: 4 },
-  streakRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
-  streak: { fontSize: 16, fontWeight: 'bold', color: '#ff5722' },
-  best: { fontSize: 14, color: '#888' },
+  cardWrapper: {
+    marginHorizontal: 16,
+    marginVertical: 12,
+  },
+  card: {
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    elevation: 3,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  avatarText: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  titleSection: {
+    flex: 1,
+  },
+  habitName: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  category: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  checkButton: {
+    padding: 8,
+  },
+  checkbox: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxDone: {},
+  statsRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statLabel: {
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  statValue: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  statDivider: {
+    width: 1,
+  },
+  progressSection: {
+    gap: 8,
+  },
+  progressBarBg: {
+    height: 8,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  progressText: {
+    fontSize: 11,
+    alignSelf: 'flex-end',
+  },
 });

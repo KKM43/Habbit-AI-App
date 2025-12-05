@@ -82,7 +82,74 @@ app.post('/motivation', (req, res) => {
   res.json({ message: msgs[Math.floor(Math.random() * msgs.length)] });
 });
 
+
+app.post('/weekly-summary', async (req, res) => {
+  const { completionRate, totalHabits, longestStreak, bestHabit, worstHabit, totalChecks, completedChecks } = req.body;
+
+  try {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "system",
+            content: `You are a kind, witty habit coach. Write a short, personal, encouraging message (2-4 sentences). 
+
+Use the data:
+- Completion rate: ${completionRate}%
+- Total habits: ${totalHabits}
+- Longest streak: ${longestStreak} days
+- Best habit: ${bestHabit} (most consistent)
+- Worst habit: ${worstHabit} (needs attention)
+- Total checks: ${totalChecks}, completed: ${completedChecks}
+
+Be casual, use emojis, mention specific habits and streaks. End with motivation.`
+          },
+          { role: "user", content: "Write my weekly habit review" }
+        ],
+        temperature: 0.9,
+        max_tokens: 300
+      })
+    });
+
+    if (!response.ok) throw new Error(`Groq error: ${response.status}`);
+
+    const data = await response.json();
+    const content = data.choices[0]?.message?.content || '';
+
+    let summary = content;
+    let recommendation = '';
+
+    // Parse the AI response (it will write in format "Summary: ... Recommendation: ...")
+    const lines = content.split('\n');
+    const summaryMatch = lines.find(line => line.toLowerCase().includes('summary:') || line.toLowerCase().includes('this week:'));
+    const recMatch = lines.find(line => line.toLowerCase().includes('recommendation:') || line.toLowerCase().includes('advice:'));
+
+    if (summaryMatch) summary = summaryMatch.replace(/^(Summary|This week):?\s*/i, '');
+    if (recMatch) recommendation = recMatch.replace(/^(Recommendation|Advice):?\s*/i, '');
+
+    res.json({
+      summary,
+      recommendation: recommendation || "Keep showing up — that's what builds legends."
+    });
+
+  } catch (error) {
+    console.error('Weekly summary error:', error);
+    res.json({
+      summary: `You completed ${Math.round(completionRate || 0)}% of your habits this week (${completedChecks || 0}/${totalChecks || 1}). That's solid work!`,
+      recommendation: longestStreak > 7 ? "Your ${longestStreak}-day streak is fire — protect it!" : "Start a new streak tomorrow. You got this."
+    });
+  }
+});
+
 app.get('/', (req, res) => res.send('GROQ HABIT AI IS ALIVE AND GOD TIER!'));
+
+
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, '0.0.0.0', () => {

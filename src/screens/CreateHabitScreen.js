@@ -14,12 +14,14 @@ import {
 import { auth, db } from '../../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../context/ThemeContext';
 import { requestPermissions, scheduleHabitReminder } from '../utils/notifications';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const categories = ['Health', 'Fitness', 'Mindfulness', 'Learning', 'Productivity', 'Social', 'Other'];
 
 export default function CreateHabitScreen({ navigation }) {
+  const { theme } = useTheme();
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [notes, setNotes] = useState('');
@@ -82,145 +84,201 @@ const onTimeChange = (event, selectedDate) => {
 };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={28} color="#333" />
+      <View style={[styles.header, { backgroundColor: theme.colors.surfaceAlt, borderBottomColor: theme.colors.border }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerBtn} activeOpacity={0.7}>
+          <Ionicons name="chevron-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>New Habit</Text>
-        <TouchableOpacity onPress={handleSave}>
-          <Text style={styles.save}>Save</Text>
+        <Text style={[styles.title, { color: theme.colors.text }]}>New Habit</Text>
+        <TouchableOpacity onPress={handleSave} style={[styles.headerBtn, styles.saveBtn, { backgroundColor: theme.colors.primary }]} activeOpacity={0.7}>
+          <Text style={styles.saveBtnText}>Save</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Habit Name */}
-      <TextInput
-        style={styles.input}
-        placeholder="Habit name (e.g., Drink 2L water)"
-        value={name}
-        onChangeText={setName}
-        autoFocus
-      />
-
-      {/* Category */}
-      <Text style={styles.label}>Category (optional)</Text>
-      <View style={styles.categoryRow}>
-        {categories.map((cat) => (
-          <TouchableOpacity
-            key={cat}
-            style={[styles.catButton, category === cat && styles.catSelected]}
-            onPress={() => setCategory(category === cat ? '' : cat)}
-          >
-            <Text style={[styles.catText, category === cat && styles.catTextSelected]}>
-              {cat}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Notes */}
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Notes (optional)"
-        value={notes}
-        onChangeText={setNotes}
-        multiline
-        textAlignVertical="top"
-      />
-
-      {/* Daily Reminder */}
-<View style={styles.reminderSection}>
-  <Text style={styles.label}>Daily Reminder</Text>
-  <View style={styles.row}>
-    <Switch value={remindersEnabled} onValueChange={setRemindersEnabled} />
-    <Text style={styles.toggleText}>Notify me daily</Text>
-  </View>
-
-  {remindersEnabled && (
-    <View style={{ marginTop: 15 }}>
-      <TouchableOpacity
-        style={styles.timeButton}
-        onPress={() => setShowPicker(true)}
-      >
-        <Ionicons name="time-outline" size={24} color="#6200ee" />
-        <Text style={styles.timeText}>
-          {selectedTime ? selectedTime : 'Tap to set time'}
-        </Text>
-      </TouchableOpacity>
-
-      {showPicker && (
-        <DateTimePicker
-          value={pickerDate}
-          mode="time"
-          is24Hour={false}   // Shows AM/PM
-          display="spinner"  // Nice spinner on Android, clock on iOS
-          onChange={onTimeChange}
+      <ScrollView style={styles.formContainer} contentContainerStyle={{ paddingBottom: 24 }}>
+        {/* Habit Name */}
+        <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>Habit Name</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
+          placeholder="e.g., Drink 2L water daily"
+          placeholderTextColor={theme.colors.textTertiary}
+          value={name}
+          onChangeText={setName}
+          autoFocus
+          maxLength={40}
         />
-      )}
+
+        {/* Category */}
+        <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>Category</Text>
+        <View style={styles.categoryRow}>
+          {categories.map((cat) => (
+            <TouchableOpacity
+              key={cat}
+              style={[styles.categoryBtn, category === cat && [styles.categoryBtnActive, { backgroundColor: theme.colors.primary }], { backgroundColor: category === cat ? theme.colors.primary : theme.colors.surfaceAlt, borderColor: theme.colors.border }]}
+              onPress={() => setCategory(category === cat ? '' : cat)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.categoryBtnText, category === cat && styles.categoryBtnTextActive, { color: category === cat ? '#fff' : theme.colors.textSecondary }]}>
+                {cat}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Notes */}
+        <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>Notes</Text>
+        <TextInput
+          style={[styles.input, styles.textArea, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
+          placeholder="Add any notes or instructions..."
+          placeholderTextColor={theme.colors.textTertiary}
+          value={notes}
+          onChangeText={setNotes}
+          multiline
+          textAlignVertical="top"
+        />
+
+        {/* Daily Reminder */}
+        <View style={styles.reminderSection}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.textSecondary }]}>Daily Reminder</Text>
+          <View style={styles.toggleRow}>
+            <Switch
+              value={remindersEnabled}
+              onValueChange={setRemindersEnabled}
+              trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
+              thumbColor={remindersEnabled ? theme.colors.primary : theme.colors.textSecondary}
+            />
+            <Text style={[styles.toggleText, { color: theme.colors.text }]}>
+              {remindersEnabled ? 'Enabled' : 'Disabled'}
+            </Text>
+          </View>
+
+          {remindersEnabled && (
+            <TouchableOpacity
+              style={[styles.timeButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+              onPress={() => setShowPicker(true)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="time-outline" size={20} color={theme.colors.primary} />
+              <Text style={[styles.timeButtonText, { color: theme.colors.text }]}>
+                {selectedTime || 'Set reminder time'}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {showPicker && (
+            <DateTimePicker
+              value={pickerDate}
+              mode="time"
+              is24Hour={false}
+              display="spinner"
+              onChange={onTimeChange}
+            />
+          )}
+        </View>
+      </ScrollView>
     </View>
-  )}
-</View>
-    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
-    paddingTop: 60,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    paddingTop: 50,
+    borderBottomWidth: 1,
   },
-  title: { fontSize: 24, fontWeight: 'bold' },
-  save: { fontSize: 18, color: '#6200ee', fontWeight: '600' },
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  headerBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  saveBtn: {},
+  saveBtnText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  formContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: 16,
+    marginBottom: 12,
+  },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    marginHorizontal: 20,
-    marginTop: 10,
-    padding: 15,
     borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     fontSize: 16,
+    marginBottom: 12,
   },
-  label: { marginLeft: 20, marginTop: 20, fontSize: 16, color: '#555' },
+  textArea: {
+    height: 100,
+    textAlignVertical: 'top',
+  },
   categoryRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    padding: 20,
-    paddingTop: 10,
+    gap: 8,
+    marginBottom: 12,
   },
-  catButton: {
-    paddingHorizontal: 16,
+  categoryBtn: {
+    paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
-    marginRight: 10,
-    marginBottom: 10,
+    borderWidth: 1,
   },
-  catSelected: { backgroundColor: '#6200ee' },
-  catText: { color: '#666' },
-  catTextSelected: { color: '#fff', fontWeight: '600' },
-  textArea: { height: 120 },
-  reminderSection: { marginHorizontal: 20, marginTop: 10 },
-  row: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },
-  toggleText: { marginLeft: 10, fontSize: 16 },
-
+  categoryBtnActive: {},
+  categoryBtnText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  categoryBtnTextActive: {
+    color: '#fff',
+  },
+  reminderSection: {
+    marginTop: 12,
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 12,
+  },
+  toggleText: {
+    marginLeft: 12,
+    fontSize: 16,
+    fontWeight: '500',
+  },
   timeButton: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  borderWidth: 1,
-  borderColor: '#6200ee',
-  borderRadius: 12,
-  padding: 16,
-  marginHorizontal: 20,
-},
-timeText: {
-  marginLeft: 12,
-  fontSize: 18,
-  color: '#333',
-  fontWeight: '500',
-},
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    height: 48,
+  },
+  timeButtonText: {
+    marginLeft: 12,
+    fontSize: 16,
+    fontWeight: '500',
+  },
 });

@@ -7,27 +7,38 @@ import AuthNavigator from './src/navigation/AuthNavigator';
 import MainNavigator from './src/navigation/MainNavigator';
 import { ActivityIndicator, View } from 'react-native';
 import { requestPermissions } from './src/utils/notifications';
+import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import { LightTheme } from './src/theme';
 
 export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}
+
+function AppContent() {
+  const { theme, isLoading } = useTheme();
   const [user, setUser] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
+  const [authLoading, setAuthLoading] = React.useState(true);
 
   React.useEffect(() => {
-  requestPermissions();
-}, []);
+    requestPermissions();
+  }, []);
 
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      setLoading(false);
+      setAuthLoading(false);
     });
     return unsubscribe;
   }, []);
 
-  if (loading) {
+  if (isLoading || authLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#6200ee" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background }}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }

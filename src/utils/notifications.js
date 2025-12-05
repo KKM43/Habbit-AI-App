@@ -40,3 +40,8 @@ export async function scheduleHabitReminder(habitName, hour, minute, habitId) {
     identifier,
   });
 }
+
+export async function cancelHabitReminder(habitId) {
+  const identifier = `habit_${habitId}`;
+  await Notifications.cancelScheduledNotificationAsync(identifier);
+}
