@@ -1,46 +1,55 @@
 {
   "expo": {
-    "name": "HabitTracker",
-    "slug": "HabitTracker",
+    "name": "HabitFlow",
+    "slug": "habitflow",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": false,
+    "scheme": "habitflow",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#6200ee"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-here"
+      },
+      "AI_SERVER_URL": "https://habit-ai-server.onrender.com"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourname.habitflow"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#6200ee"
       },
-      "edgeToEdgeEnabled": true,
-      "package": "com.kaustubhexpo.HabitTracker",
+      "package": "com.yourname.habitflow",
+      "googleServicesFile": "./google-services.json",
       "permissions": [
-        "POST_NOTIFICATIONS"
+        "android.permission.POST_NOTIFICATIONS"
       ]
     },
     "plugins": [
       [
         "expo-notifications",
         {
-          "icon": "./assets/icon.png",
-          "color": "#6200ee",
-          "sounds": [
-            "default"
-          ]
+          "icon": "./assets/notification-icon.png",
+          "color": "#6200ee"
         }
       ],
       "expo-web-browser"
     ],
     "web": {
-      "favicon": "./assets/favicon.png"
+      "bundler": "metro"
     }
   }
 }

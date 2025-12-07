@@ -125,7 +125,7 @@ Be casual, use emojis, mention specific habits and streaks. End with motivation.
     let summary = content;
     let recommendation = '';
 
-    // Parse the AI response (it will write in format "Summary: ... Recommendation: ...")
+    
     const lines = content.split('\n');
     const summaryMatch = lines.find(line => line.toLowerCase().includes('summary:') || line.toLowerCase().includes('this week:'));
     const recMatch = lines.find(line => line.toLowerCase().includes('recommendation:') || line.toLowerCase().includes('advice:'));

@@ -1,4 +1,3 @@
-// src/components/HabitCard.js
 import React, { useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';

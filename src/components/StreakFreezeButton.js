@@ -1,4 +1,3 @@
-// src/components/StreakFreezeButton.js
 import React, { useState, useEffect } from 'react';
 import { TouchableOpacity, Text, StyleSheet, Alert, View } from 'react-native';
 import { doc, getDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
@@ -18,7 +17,7 @@ export default function StreakFreezeButton({ habitId, currentStreak }) {
       const today = new Date().toDateString();
       const lastFreezeDate = data.lastStreakFreezeDate?.toDate?.()?.toDateString();
 
-      // Reset 2 freezes every month
+      
       const now = new Date();
       const monthKey = `${now.getFullYear()}-${now.getMonth()}`;
       const lastMonthKey = data.lastFreezeMonth || '';
@@ -33,7 +32,7 @@ export default function StreakFreezeButton({ habitId, currentStreak }) {
         setFreezesLeft(2 - (data.streakFreezesUsed || 0));
       }
 
-      // Check if already used today on this habit
+      
       const habitRef = doc(db, 'users', auth.currentUser.uid, 'habits', habitId);
       const habitSnap = await getDoc(habitRef);
       setUsedToday(habitSnap.data()?.streakFrozenToday === true);
