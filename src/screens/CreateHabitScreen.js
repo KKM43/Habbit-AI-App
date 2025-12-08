@@ -170,7 +170,7 @@ const onTimeChange = (event, selectedDate) => {
             <DateTimePicker
               value={pickerDate}
               mode="time"
-              is24Hour={false}
+              is24Hour={true}
               display="spinner"
               onChange={onTimeChange}
             />

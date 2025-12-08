@@ -129,7 +129,7 @@ export default function EditHabitScreen({ route, navigation }) {
           <DateTimePicker
             value={pickerDate}
             mode="time"
-            is24Hour={false}
+            is24Hour={true}
             display="spinner"
             onChange={(e, date) => {
               setShowPicker(Platform.OS === 'ios');

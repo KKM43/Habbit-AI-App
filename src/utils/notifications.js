@@ -2,12 +2,16 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
+// Configure notification handler - only show if app is in foreground
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
+  handleNotification: async (notification) => {
+    console.log('Notification received:', notification);
+    return {
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    };
+  },
 });
 
 export async function requestPermissions() {
@@ -28,33 +32,45 @@ export async function requestPermissions() {
 
 export async function scheduleHabitReminder(habitName, hour, minute, habitId) {
   const identifier = `habit_${habitId}`;
-  await Notifications.cancelScheduledNotificationAsync(identifier);
+  
+  try {
+    // Cancel any existing notification first
+    try {
+      await Notifications.cancelScheduledNotificationAsync(identifier);
+    } catch (e) {
+      console.log('No existing notification to cancel');
+    }
 
-  // Calculate the next occurrence of the scheduled time
-  const now = new Date();
-  const scheduledTime = new Date();
-  scheduledTime.setHours(hour, minute, 0, 0);
+    console.log(`Scheduling reminder for ${habitName} at ${hour}:${minute.toString().padStart(2, '0')}`);
 
-  // If the time has already passed today, schedule for tomorrow
-  if (scheduledTime <= now) {
-    scheduledTime.setDate(scheduledTime.getDate() + 1);
+    // Android requires a specific format for daily notifications
+    // Use object with hour and minute for daily recurring notifications
+    const trigger = {
+      hour: hour,
+      minute: minute,
+      repeats: true, // This makes it daily
+    };
+
+    const notificationId = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Habit Reminder",
+        body: `Time to do: ${habitName}!`,
+        sound: true,
+        data: { 
+          habitId,
+          habitName,
+        },
+      },
+      trigger: trigger,
+      identifier,
+    });
+
+    console.log('Notification scheduled successfully:', notificationId);
+    return notificationId;
+  } catch (error) {
+    console.error('Error scheduling notification:', error);
+    throw error;
   }
-
-  // Calculate seconds until the scheduled time
-  const secondsUntil = Math.floor((scheduledTime.getTime() - now.getTime()) / 1000);
-
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Habit Time!",
-      body: `${habitName} — keep your streak alive!`,
-      sound: 'default',
-    },
-    trigger: {
-      seconds: secondsUntil,
-      repeats: true,
-    },
-    identifier,
-  });
 }
 
 export async function cancelHabitReminder(habitId) {
