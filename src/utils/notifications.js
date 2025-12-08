@@ -30,13 +30,29 @@ export async function scheduleHabitReminder(habitName, hour, minute, habitId) {
   const identifier = `habit_${habitId}`;
   await Notifications.cancelScheduledNotificationAsync(identifier);
 
+  // Calculate the next occurrence of the scheduled time
+  const now = new Date();
+  const scheduledTime = new Date();
+  scheduledTime.setHours(hour, minute, 0, 0);
+
+  // If the time has already passed today, schedule for tomorrow
+  if (scheduledTime <= now) {
+    scheduledTime.setDate(scheduledTime.getDate() + 1);
+  }
+
+  // Calculate seconds until the scheduled time
+  const secondsUntil = Math.floor((scheduledTime.getTime() - now.getTime()) / 1000);
+
   await Notifications.scheduleNotificationAsync({
     content: {
       title: "Habit Time!",
       body: `${habitName} — keep your streak alive!`,
       sound: 'default',
     },
-    trigger: { hour, minute, repeats: true },
+    trigger: {
+      seconds: secondsUntil,
+      repeats: true,
+    },
     identifier,
   });
 }

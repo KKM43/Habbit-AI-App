@@ -6,34 +6,31 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
     "scheme": "habitflow",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#6200ee"
     },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "extra": {
       "eas": {
-        "projectId": "your-project-id-here"
+        "projectId": "b1aed33d-909c-4462-9167-0ea3647b389f"
       },
       "AI_SERVER_URL": "https://habit-ai-server.onrender.com"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourname.habitflow"
+      "bundleIdentifier": "com.kaustubhexpo.habitflow"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#6200ee"
       },
-      "package": "com.yourname.habitflow",
-      "googleServicesFile": "./google-services.json",
+      "package": "com.kaustubhexpo.habitflow",
       "permissions": [
         "android.permission.POST_NOTIFICATIONS"
       ]
@@ -48,8 +45,6 @@
       ],
       "expo-web-browser"
     ],
-    "web": {
-      "bundler": "metro"
-    }
+    "owner": "kaustubhexpo"
   }
 }
