@@ -4,6 +4,7 @@ import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import AuthNavigator from './src/navigation/AuthNavigator';
 import MainNavigator from './src/navigation/MainNavigator';
+import SplashScreen from './src/screens/SplashScreen';
 import { ActivityIndicator, View } from 'react-native';
 import { requestPermissions } from './src/utils/notifications';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
@@ -35,11 +36,7 @@ function AppContent() {
   }, []);
 
   if (isLoading || authLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background }}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-      </View>
-    );
+    return <SplashScreen />;
   }
 
   return (

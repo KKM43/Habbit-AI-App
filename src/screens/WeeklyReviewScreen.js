@@ -42,13 +42,13 @@ export default function WeeklyReviewScreen({ navigation }) {
           progress: doc.data().progress || {},
         }));
 
-        // Get the last 7 full days (today not included yet, or include it – adjust as you prefer)
+        
         const last7Days = [];
         for (let i = 6; i >= 0; i--) {
           const date = new Date();
           date.setDate(date.getDate() - i);
           date.setHours(0, 0, 0, 0);
-          last7Days.push(date.toISOString().split('T')[0]); // YYYY-MM-DD
+          last7Days.push(date.toISOString().split('T')[0]); 
         }
 
         let totalChecks = 0;
@@ -60,7 +60,7 @@ export default function WeeklyReviewScreen({ navigation }) {
           let maxStreak = 0;
           let doneInWeek = 0;
 
-          // We check from oldest to newest to calculate current streak correctly
+          
           [...last7Days].reverse().forEach((date) => {
             const dayData = habit.progress[date];
             if (dayData?.status === 'done') {
@@ -71,10 +71,10 @@ export default function WeeklyReviewScreen({ navigation }) {
             } else if (dayData?.status === 'missed' || dayData?.status === 'skipped') {
               currentStreak = 0;
             }
-            // If no data for the day → treat as not done (but don't break streak logic)
+            
           });
 
-          totalChecks += 7; // every habit has 7 possible checks
+          totalChecks += 7; 
 
           habitStats.push({
             name: habit.name,
@@ -87,7 +87,7 @@ export default function WeeklyReviewScreen({ navigation }) {
         const completionRate = Math.round((completedChecks / totalChecks) * 100);
         const longestCurrentStreak = Math.max(...habitStats.map((h) => h.streak), 0);
 
-        // Best & worst habits this week
+        
         const bestHabit = habitStats.reduce((prev, curr) =>
           curr.done > prev.done ? curr : prev
         );
@@ -164,9 +164,7 @@ export default function WeeklyReviewScreen({ navigation }) {
         </Text>
       </View>
 
-      <Text style={[styles.footer, { color: theme.colors.textSecondary }]}>
-        {/* If you like this  • Please give your */}
-      </Text>
+      
     </ScrollView>
   );
 }

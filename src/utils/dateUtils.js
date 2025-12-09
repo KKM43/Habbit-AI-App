@@ -1,7 +1,7 @@
 // src/utils/dateUtils.js
 export const getTodayString = () => {
   const today = new Date();
-  return today.toISOString().split('T')[0]; // "2025-11-19"
+  return today.toISOString().split('T')[0]; 
 };
 
 export const getDatesArray = (daysBack = 30) => {
@@ -14,13 +14,13 @@ export const getDatesArray = (daysBack = 30) => {
   return dates;
 };
 
-// Calculate current & best streak (client-side, super fast)
+
 export const calculateStreaks = (progressObj) => {
   if (!progressObj) return { current: 0, best: 0 };
 
   const sortedDates = Object.keys(progressObj)
     .filter(date => progressObj[date]?.status === 'done')
-    .sort((a, b) => b.localeCompare(a)); // newest first
+    .sort((a, b) => b.localeCompare(a)); 
 
   if (sortedDates.length === 0) return { current: 0, best: 0 };
 
@@ -47,7 +47,7 @@ export const calculateStreaks = (progressObj) => {
   }
   best = Math.max(best, temp);
 
-  // Current streak: only if yesterday or today was done
+   
   const today = getTodayString();
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -56,7 +56,7 @@ export const calculateStreaks = (progressObj) => {
   if (sortedDates[0] === today || sortedDates[0] === yesterdayStr) {
     current = temp;
     if (sortedDates[0] === yesterdayStr && sortedDates[1] !== today) {
-      current = temp - 1; // broke today
+      current = temp - 1;  
     }
   }
 

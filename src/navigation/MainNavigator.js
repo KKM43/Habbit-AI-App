@@ -10,13 +10,13 @@ import EditHabitScreen from '../screens/EditHabitScreen';
 import TasksScreen from '../screens/TasksScreen';
 import AIScreen from '../screens/AIScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-import WeeklyReviewScreen from '../screens/WeeklyReviewScreen'; // ← ADD THIS
+import WeeklyReviewScreen from '../screens/WeeklyReviewScreen'; 
 
 import { Ionicons } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
-const RootStack = createStackNavigator(); // ← NEW: Root stack for modals
+const RootStack = createStackNavigator(); 
 
 // Home + Habit flows
 function HomeStackNavigator() {

@@ -44,7 +44,7 @@ export default function SettingsScreen({ navigation }) {
                     try {
                       const userId = auth.currentUser.uid;
 
-                      // Delete all habits + progress
+                      
                       const habitsRef = collection(db, 'users', userId, 'habits');
                       const habitsSnap = await getDocs(habitsRef);
                       for (const habitDoc of habitsSnap.docs) {
@@ -56,14 +56,14 @@ export default function SettingsScreen({ navigation }) {
                         await deleteDoc(habitDoc.ref);
                       }
 
-                      // Delete all tasks
+                      
                       const tasksRef = collection(db, 'users', userId, 'tasks');
                       const tasksSnap = await getDocs(tasksRef);
                       for (const task of tasksSnap.docs) {
                         await deleteDoc(task.ref);
                       }
 
-                      // Cancel all notifications
+                      
                       await Notifications.cancelAllScheduledNotificationsAsync();
 
                       Alert.alert(

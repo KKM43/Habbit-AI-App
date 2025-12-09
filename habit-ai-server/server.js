@@ -22,7 +22,7 @@ app.post('/suggest-habits', async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",   // ← CURRENT BEST MODEL (Nov 2025)
+        model: "llama-3.3-70b-versatile",  
         messages: [
           { 
             role: "system", 
@@ -154,7 +154,7 @@ app.get('/', (req, res) => res.send('GROQ HABIT AI IS ALIVE AND GOD TIER!'));
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`\n✅ GROQ AI SERVER RUNNING!`);
-  console.log(`🌐 Port: ${PORT}`);
-  console.log(`🔑 API Key: ${GROQ_API_KEY ? 'Configured' : 'MISSING!'}`);
-  console.log(`📝 Test with: "stop procrastinating", "fix sleep", "learn Spanish"\n`);
+  console.log(`Port: ${PORT}`);
+  console.log(`API Key: ${GROQ_API_KEY ? 'Configured' : 'MISSING!'}`);
+  console.log(`Test with: "stop procrastinating", "fix sleep", "learn Spanish"\n`);
 });

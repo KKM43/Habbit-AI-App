@@ -102,7 +102,7 @@ export default function StreakFreezeButton({ habitId, currentStreak }) {
 const styles = StyleSheet.create({
   button: {
     flexDirection: 'row',
-    backgroundColor: '#ff6b6b',
+    backgroundColor: '#00B4D8',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,

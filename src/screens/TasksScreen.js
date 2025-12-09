@@ -28,7 +28,7 @@ export default function TasksScreen() {
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setTasks(list); // Show ALL tasks (completed + incomplete)
+      setTasks(list); 
     });
 
     return unsubscribe;

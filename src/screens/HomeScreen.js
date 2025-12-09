@@ -26,12 +26,18 @@ export default function HomeScreen({ navigation }) {
     ]).start();
   }, []);
 
+  
+  const getTodayCompletedCount = () => {
+    const today = getTodayString();
+    return habits.filter(habit => habit.progress?.[today]?.status === 'done').length;
+  };
+
 
 
 useEffect(() => {
   const habitsRef = collection(db, 'users', userId, 'habits');
 
-  // Listen to each habit + its progress subcollection
+  
   const unsubscribers = [];
 
   const q = query(habitsRef, orderBy('createdAt', 'desc'));
@@ -39,7 +45,7 @@ useEffect(() => {
     const habitsList = snapshot.docs.map(habitDoc => {
       const habitData = { id: habitDoc.id, ...habitDoc.data(), progress: {} };
 
-      // For each habit, listen to its progress subcollection
+      
       const progressRef = collection(db, 'users', userId, 'habits', habitDoc.id, 'progress');
       const progressUnsubscribe = onSnapshot(progressRef, (progressSnap) => {
         const progress = {};
@@ -76,7 +82,7 @@ useEffect(() => {
     const progressRef = doc(db, 'users', userId, 'habits', habitId, 'progress', today);
 
     if (currentProgress?.[today]?.status === 'done') {
-      await deleteDoc(progressRef); // unmark
+      await deleteDoc(progressRef); 
     } else {
       await setDoc(progressRef, { status: 'done', timestamp: new Date() }, { merge: true });
     }
@@ -113,9 +119,9 @@ useEffect(() => {
           <View style={styles.headerContent}>
             <Text style={styles.headerTitle}>AI Habit Tracker</Text>
             <Text style={styles.headerSubtitle}>
-              {habits.length} {habits.length === 1 ? 'habit' : 'habits'} to complete
+              Completed {getTodayCompletedCount()} / {habits.length} {habits.length === 1 ? 'habit' : 'habits'} today
             </Text>
-          </View>
+          </View>s
 
           <TouchableOpacity
             onPress={handleSignOut}

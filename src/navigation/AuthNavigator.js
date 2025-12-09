@@ -65,21 +65,7 @@ function LoginScreen({ navigation }) {
     ]).start();
   }, [isDarkMode]);
 
-  // const handleLogin = async () => {
-  //   if (!email.trim() || !password) {
-  //     Alert.alert("Missing Fields", "Please enter both email and password");
-  //     return;
-  //   }
-  //   setLoading(true);
-  //   try {
-  //     await signInWithEmailAndPassword(auth, email.trim(), password);
-  //   } catch (err) {
-  //     Alert.alert("Login Failed", err.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
+  
 //   const handleGoogleSignIn = async () => {
 //   try {
 //     const userCredential = await signInWithGoogle();
@@ -117,7 +103,7 @@ const handleLogin = async () => {
 
   try {
     await signInWithEmailAndPassword(auth, email.trim(), password);
-    // Success → navigation happens automatically via auth state
+  
   } catch (err) {
     let title = "Login Failed";
     let message = "Something went wrong. Please try again.";
@@ -150,10 +136,10 @@ const handleLogin = async () => {
 
     Alert.alert(title, message, [
       { text: "OK" },
-      // Optional: Add "Forgot Password?" button for wrong-password
+  
       err.code === 'auth/wrong-password' && {
         text: "Forgot Password?",
-        onPress: () => navigation.navigate('ForgotPassword') // create this later if you want
+        onPress: () => navigation.navigate('ForgotPassword') // for later version 0.2
       }
     ].filter(Boolean));
   } finally {
@@ -281,7 +267,7 @@ const handleLogin = async () => {
           </TouchableOpacity>
 
 
-          {/* NEW WORKING GOOGLE SIGN-IN BUTTON */}
+          {/*GOOGLE SIGN-IN BUTTON */}
           {/* <View style={{ marginTop: 16, alignItems: 'center' }}>
             <GoogleSignInButton 
               onSuccess={() => {

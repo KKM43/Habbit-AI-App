@@ -70,7 +70,7 @@ export default function HabitDetailScreen({ route, navigation }) {
         </TouchableOpacity>
         <View style={styles.headerRight}>
           <TouchableOpacity onPress={() => navigation.navigate('EditHabit', { habitId })} style={styles.iconBtn}>
-            <Ionicons name="pencil" size={22} color={theme.colors.primary} />
+            <Ionicons name="create" size={22} color={theme.colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity onPress={deleteHabit} style={styles.iconBtn}>
             <Ionicons name="trash" size={22} color={theme.colors.error} />
@@ -97,23 +97,48 @@ export default function HabitDetailScreen({ route, navigation }) {
         </Text>
       ) : null}
 
-      <Text style={[styles.calendarTitle, { color: theme.colors.text }]}>Last 30 Days</Text>
-      <View style={styles.calendar}>
-        {dates.map((date) => {
-          const done = habit.progress?.[date]?.status === 'done';
-          return (
-            <View key={date} style={styles.day}>
-              <Text style={[styles.dayLabel, { color: theme.colors.textSecondary }]}>{date.slice(8)}</Text>
-              <View style={[styles.dayBox, done && styles.doneBox, { backgroundColor: done ? theme.colors.success : theme.colors.surfaceAlt }]} />
-            </View>
-          );
-        })}
+      {/* MILESTONE CELEBRATION MESSAGE */}
+      {(current === 7 || current === 14 || current === 21 || current === 30) && (
+        <View style={[styles.milestoneCard, { backgroundColor: theme.colors.primary + '15', borderColor: theme.colors.primary }]}>
+          <Ionicons name="star" size={28} color={theme.colors.primary} style={{ marginBottom: 8 }} />
+          <Text style={[styles.milestoneTitle, { color: theme.colors.primary }]}>Amazing Milestone!</Text>
+          <Text style={[styles.milestoneText, { color: theme.colors.text }]}>
+            {current === 7 && "🔥 You've reached a week! Keep the momentum going!"}
+            {current === 14 && "💪 Two weeks of consistency! You're on fire!"}
+            {current === 21 && "🌟 Three weeks! This is now becoming a habit!"}
+            {current === 30 && "👑 30 days of excellence! You're unstoppable!"}
+          </Text>
+        </View>
+      )}
+
+      <View style={[styles.calendarSection, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+        <Text style={[styles.calendarTitle, { color: theme.colors.text }]}>Last 30 Days</Text>
+        <View style={styles.calendar}>
+          {dates.map((date) => {
+            const progress = habit.progress?.[date];
+            const done = progress?.status === 'done';
+            const isFrozen = progress?.frozen;
+            const isMissed = progress?.status === 'missed' || (!done && progress);
+            
+            return (
+              <View key={date} style={styles.day}>
+                <Text style={[styles.dayLabel, { color: theme.colors.textSecondary }]}>{date.slice(8)}</Text>
+                <View style={[styles.dayBox, { 
+                  backgroundColor: isFrozen ? '#E0F4FF' : (done ? theme.colors.success : (isMissed ? '#FFE0E0' : theme.colors.surfaceAlt)) 
+                }]}>
+                  {isFrozen && <Ionicons name="snow" size={18} color="#00B4D8" />}
+                  {done && !isFrozen && <Ionicons name="checkmark" size={20} color="white" style={{ fontWeight: 'bold' }} />}
+                  {isMissed && !isFrozen && <Ionicons name="close" size={20} color="#FF6B6B" style={{ fontWeight: 'bold' }} />}
+                </View>
+              </View>
+            );
+          })}
+        </View>
       </View>
     </ScrollView>
   );
 }
 
-// Your existing styles remain unchanged
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 60 },
@@ -126,10 +151,25 @@ const styles = StyleSheet.create({
   streak: { fontSize: 24, fontWeight: '700' },
   best: { fontSize: 18, opacity: 0.8 },
   notes: { margin: 20, padding: 20, borderRadius: 16, borderWidth: 1, fontSize: 16, lineHeight: 24 },
-  calendarTitle: { fontSize: 20, fontWeight: 'bold', marginLeft: 20, marginTop: 20 },
-  calendar: { flexDirection: 'row', flexWrap: 'wrap', padding: 20, gap: 8 },
-  day: { alignItems: 'center', width: '12.5%' },
-  dayLabel: { fontSize: 12, marginBottom: 4 },
-  dayBox: { width: 36, height: 36, borderRadius: 10 },
+  milestoneCard: { margin: 20, padding: 20, borderRadius: 16, borderWidth: 2, alignItems: 'center' },
+  milestoneTitle: { fontSize: 20, fontWeight: '700', marginBottom: 8 },
+  milestoneText: { fontSize: 16, textAlign: 'center', lineHeight: 24 },
+  calendarSection: { margin: 20, padding: 24, borderRadius: 20, borderWidth: 1 },
+  calendarTitle: { fontSize: 22, fontWeight: 'bold', marginBottom: 16 },
+  calendar: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  day: { alignItems: 'center', width: '22%', marginBottom: 8 },
+  dayLabel: { fontSize: 11, marginBottom: 6, fontWeight: '600', letterSpacing: 0.3 },
+  dayBox: { 
+    width: 40, 
+    height: 40, 
+    borderRadius: 12, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 3,
+  },
   doneBox: { opacity: 1 },
 });
