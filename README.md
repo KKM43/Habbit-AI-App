@@ -29,8 +29,7 @@ It helps you track habits, protect streaks, get personalized weekly reviews from
 ### Quick Start (Local Development)
 
 1. Clone the repo
-git clone https://github.com/yourusername/habitflow.git
-cd habitflow
+git clone https://github.com/KKM43/Habbit-AI-App.git
 
 2.Install dependencies
 npm install or yarn install
