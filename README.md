@@ -33,13 +33,16 @@ It helps you track habits, protect streaks, get personalized weekly reviews from
    git clone https://github.com/KKM43/Habbit-AI-App.git
    cd Habbit-AI-App
 
-Install dependenciesBashnpm install
+Install dependencies: 
+npm install
 # or
 yarn install
-Start the AI server (in a separate terminal)Bashcd habit-ai-server
+Start the AI server (in a separate terminal)
+cd habit-ai-server
 npm install
 node server.js
-Run the appBashnpx expo start --clear
+Run the app
+npx expo start --clear
 Open on your phone via Expo Go or emulator
 
 Production Setup
