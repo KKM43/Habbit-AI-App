@@ -31,18 +31,14 @@ It helps you track habits, protect streaks, get personalized weekly reviews from
 1. Clone the repo
 git clone https://github.com/KKM43/Habbit-AI-App.git
 
-2.Install dependencies
-npm install or yarn install
+2.Install dependencies : npm install or yarn install
 
-3. Start the AI server (in a separate terminal)
+3. Start the AI server (in a separate terminal) : 
 cd habit-ai-server
 npm install
 node server.js
 
-4.Run the app
+4.Run the app : 
 npx expo start --clear
 
 5.Open on your phone via Expo Go or emulator
-```bash
-git clone https://github.com/yourusername/habitflow.git
-cd habitflow
